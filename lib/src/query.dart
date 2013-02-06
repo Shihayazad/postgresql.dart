@@ -27,41 +27,20 @@ class _Query implements Query {
     _resultMapper.onData(_resultReader, _streamer);
   }
 
-  void complete() {
-    changeState(_COMPLETE);
-    if (!_streamer.future.isComplete) {
-      _streamer.complete(this);
-    }
-  }
-
-  void completeException(ex) {
-    changeState(_COMPLETE);
-    if (!_streamer.future.isComplete) {
-      _streamer.completeException(ex);
-    }
-  }
-
   // Delegate to stream impl.
   void onReceive(void receiver(dynamic value)) =>
       _streamer.stream.onReceive(receiver);
   Future<dynamic> one() => _streamer.stream.one();
   Future<List<dynamic>> all() => _streamer.stream.all();
-  dynamic get value => _streamer.stream.value;
-  Object get exception => _streamer.stream.exception;
-  Object get stackTrace => _streamer.stream.stackTrace;
-  bool get isComplete => _streamer.stream.isComplete;
-  bool get hasValue => _streamer.stream.hasValue;
-  void onComplete(void complete(Future<dynamic> future)) =>
-      _streamer.stream.onComplete(complete);
-  void then(void onSuccess(dynamic value)) =>
-      _streamer.stream.then(onSuccess);
-  void handleException(bool onException(Object exception)) =>
-      _streamer.stream.handleException(onException);
-  Future transform(transformation(dynamic value)) =>
-      _streamer.stream.transform(transformation);
-  Future chain(Future transformation(dynamic value)) =>
-      _streamer.stream.chain(transformation);
-  Future transformException(transformation(Object exception)) =>
-      _streamer.stream.transformException(transformation);
+ 
+  Future then(onValue(value), { onError(AsyncError asyncError) }) => _streamer.stream.then(onValue, onError: onError);
+  Future catchError(onError(AsyncError asyncError),
+                    {bool test(Object error)}) => _streamer.stream.catchError(onError, test: test);
+  Future whenComplete(action()) => _streamer.stream.whenComplete(action);
+  Stream asStream() => _streamer.stream.asStream();
+  
+  void complete([value]) => _streamer.complete(value);
+  void completeError(Object exception, [Object stackTrace]) =>
+      _streamer.completeError(exception, stackTrace);
 }
 

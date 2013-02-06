@@ -25,7 +25,7 @@ class _Stream<T> implements Stream<T> {
       hasResult = true;
       value = val;
     });
-    return _future.transform((_) => value);
+    return _future.then((_) => value);
   }
 
   Future<List<T>> all() {
@@ -33,23 +33,18 @@ class _Stream<T> implements Stream<T> {
     onReceive((val) {
       list.add(val);
     });
-    return _future.transform((_) => list);
+    return _future.then((_) => list);
   }
 
   // Delegate to future implementation.
   //factory Future.immediate(T value) => new FutureImpl<T>.immediate(value);
-  T get value => _future.value;
-  Object get exception => _future.exception;
-  Object get stackTrace => _future.stackTrace;
-  bool get isComplete => _future.isComplete;
-  bool get hasValue => _future.hasValue;
-  void onComplete(void complete(Future<T> future)) => _future.onComplete(complete);
-  void then(void onSuccess(T value)) => _future.then(onSuccess);
-  void handleException(bool onException(Object exception)) => _future.handleException(onException);
-  Future transform(transformation(T value)) => _future.transform(transformation);
-  Future chain(Future transformation(T value)) => _future.chain(transformation);
-  Future transformException(transformation(Object exception)) => _future.transformException(transformation);
 
+  Future then(onValue(T value), { onError(AsyncError asyncError) }) => _future.then(onValue, onError: onError);
+  Future catchError(onError(AsyncError asyncError),
+                    {bool test(Object error)}) => _future.catchError(onError, test: test);
+  
+  Future<T> whenComplete(action()) => _future.whenComplete(action);
+  Stream<T> asStream() => _future.asStream();
 }
 
 class _Streamer<T> implements Streamer<T> {
@@ -78,8 +73,8 @@ class _Streamer<T> implements Streamer<T> {
 
   // Delegate to Completer implementation.
   Future get future => _completer.future;
-  void complete(T value) => _completer.complete(value);
-  void completeException(Object exception, [Object stackTrace]) =>
-      _completer.completeException(exception, stackTrace);
+  void complete([T value]) => _completer.complete(value);
+  void completeError(Object exception, [Object stackTrace]) =>
+      _completer.completeError(exception, stackTrace);
 }
 

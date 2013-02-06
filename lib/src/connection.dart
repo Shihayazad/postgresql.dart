@@ -15,6 +15,7 @@ class _Connection implements Connection {
 
   // Don't set this directly use _changeState().
   _ConnectionState _state = _NOT_CONNECTED;
+  bool _connectComplete = false;
 
   bool get _ok => _state == _IDLE || _state == _BUSY || _state == _READY;
 
@@ -50,17 +51,17 @@ class _Connection implements Connection {
         || _state == _SOCKET_CONNECTED
         || _state == _AUTHENTICATING
         || _state == _AUTHENTICATED)
-          && !_connectCompleter.future.isComplete
+          && !_connectComplete
           && err.type != SERVER_NOTICE) {
 
-      _connectCompleter.completeException(err);
+      _connectCompleter.completeError(err);
 
     } else if ((_state == _BUSY || _state == _READY)
         && err.type != SERVER_NOTICE) {
 
       assert(_query != null);
       _changeState(_READY);
-      _query.completeException(err);
+      _query.completeError(err);
 
     } else {
       if (settings.onUnhandledErrorOrNotice != null) {
@@ -261,7 +262,8 @@ class _Connection implements Connection {
     _changeState(_IDLE);
 
     if (s == _AUTHENTICATED) {
-      if (!_connectCompleter.future.isComplete) {
+      if (!_connectComplete) {
+        _connectCompleter.future.then( (_) => _connectComplete = true);
         _connectCompleter.complete(this);
       }
     } else {
@@ -595,6 +597,6 @@ class _Connection implements Connection {
 
 String _md5s(String s) {
   var hash = new MD5();
-  hash.update(s.charCodes);
-  return CryptoUtils.bytesToHex(hash.digest());
+  hash.add(s.charCodes);
+  return CryptoUtils.bytesToHex(hash.close());
 }

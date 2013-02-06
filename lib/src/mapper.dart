@@ -49,7 +49,7 @@ class _DynamicRowMapper implements Mapper {
 
     while (r.hasNext()) {
       if (r.event == START_COMMAND) {
-        _columnNames = r.columnDescs.map((c) => c.name);
+        _columnNames = r.columnDescs.map((c) => c.name).toList();
 
         // Debugging
         // r.columnDescs.forEach((cd) => print(cd));

@@ -1,4 +1,4 @@
-//#library('postgresql');
+library postgresql;
 
 //FIXME imports ?
 import 'dart:crypto';
@@ -6,6 +6,8 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
 import 'dart:scalarlist';
+import 'dart:async';
+import 'dart:collection';
 
 part '../lib/src/postgresql.dart';
 
