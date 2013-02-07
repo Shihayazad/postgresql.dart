@@ -24,7 +24,7 @@ class _OutputBuffer {
 
 
   void writeToSocket(Socket socket, [void callback(PgError error)]) {
-    _writeToSocket(socket, 0, callback);
+    _writeToSocket(socket, _start, callback);
   }
 
   void _log(msg) => print(msg);

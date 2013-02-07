@@ -17,18 +17,16 @@ class _DynamicRow {
     if (_columnNames == null) {
       return;
     }
-
+    var colName = name;
     if (name.startsWith('get:')) {
       var colName = name.substring(4, name.length);
-      var i = _columnNames.indexOf(colName);
-      if (i != -1) {
-        return _values[i];
-      } else {
-        //FIXME throw NoSuchMethodError
-        throw new Exception('Unknown column name: $colName.');
-      }
+    }
+    var i = _columnNames.indexOf(colName);
+    if (i != -1) {
+      return _values[i];
     } else {
       //FIXME throw NoSuchMethodError
+      throw new Exception('Unknown column name: $colName.');
     }
   }
 
